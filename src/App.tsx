@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface Todo {
@@ -26,7 +25,7 @@ const App = () => {
         console.log("Big Data", data);
       } catch (error) {
         if (error instanceof Error) {
-          setError("An unknown error has occured");
+          setError("An error occured when fetching api");
         }
       } finally {
         setIsLoading(false);
@@ -52,12 +51,10 @@ const App = () => {
   const handleDeleteTodo = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
-
   const handleEditTodo = (id: number, title: string) => {
     setEditingId(id);
     setEditingText(title);
   };
-
   const handleSaveTodo = () => {
     if (editingId !== null && editingText.trim()) {
       setTodos(
@@ -71,55 +68,56 @@ const App = () => {
 
   return (
     <div>
-      <div>
-        <input
-          value={newTodo}
-          type="text"
-          onChange={(e) => setNewTodo(e.target.value)}
-        />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button onClick={() => handleAddTodo}>Add todo +</button>
-        {isLoading ? (
-          <div>Loading....</div>
-        ) : (
-          <div>
-            <ul>
-              {todos.map((todo) => (
-                <li key={todo.id}>
-                  {editingId === todo.id ? (
-                    <div>
-                      <input
-                        value={editingText}
-                        type="text"
-                        onChange={(e) => setEditingText(e.target.value)}
-                      />
-                      <button onClick={handleSaveTodo}>Save</button>
-                    </div>
-                  ) : (
-                    <div>
-                      {todo.title}
-                      <button
-                        onClick={() => {
-                          handleDeleteTodo(todo.id);
-                        }}
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleEditTodo(todo.id, todo.title);
-                        }}
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      <input
+        value={newTodo}
+        type="text"
+        onChange={(e) => setNewTodo(e.target.value)}
+      />
+      <button onClick={handleAddTodo}>Add Todo +</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {isLoading ? (
+        <div>Loading....</div>
+      ) : (
+        <div>
+          <ul>
+            {todos.map((todo) => (
+              <li key={todo.id}>
+                {editingId === todo.id ? (
+                  <div>
+                    <input
+                      value={editingText}
+                      type="text"
+                      onChange={(e) => {
+                        setEditingText(e.target.value);
+                      }}
+                    />
+                    <button onClick={handleSaveTodo}>Save</button>
+                  </div>
+                ) : (
+                  <div>
+                    {" "}
+                    {todo.title}
+                    <button
+                      onClick={() => {
+                        handleEditTodo(todo.id, todo.title);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleDeleteTodo(todo.id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
