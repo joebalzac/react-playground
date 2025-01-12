@@ -25,12 +25,13 @@ const App = () => {
         console.log("Big Data", data);
       } catch (error) {
         if (error instanceof Error) {
-          setError("An error occured when fetching api");
+          setError("An unknow error has occured");
         }
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchTodos();
   }, []);
 
@@ -43,7 +44,7 @@ const App = () => {
       setTodos([...todos, newTodoItem]);
       setNewTodo("");
     } else {
-      setError("Please add a todo");
+      setError("please add a todo");
       setTimeout(() => setError(""), 3000);
     }
   };
@@ -51,10 +52,12 @@ const App = () => {
   const handleDeleteTodo = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
+
   const handleEditTodo = (id: number, title: string) => {
     setEditingId(id);
     setEditingText(title);
   };
+
   const handleSaveTodo = () => {
     if (editingId !== null && editingText.trim()) {
       setTodos(
@@ -71,12 +74,14 @@ const App = () => {
       <input
         value={newTodo}
         type="text"
-        onChange={(e) => setNewTodo(e.target.value)}
+        onChange={(e) => {
+          setNewTodo(e.target.value);
+        }}
       />
       <button onClick={handleAddTodo}>Add Todo +</button>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {isLoading ? (
-        <div>Loading....</div>
+        <div>isLoading....</div>
       ) : (
         <div>
           <ul>
@@ -87,9 +92,7 @@ const App = () => {
                     <input
                       value={editingText}
                       type="text"
-                      onChange={(e) => {
-                        setEditingText(e.target.value);
-                      }}
+                      onChange={(e) => setEditingText(e.target.value)}
                     />
                     <button onClick={handleSaveTodo}>Save</button>
                   </div>
@@ -99,17 +102,17 @@ const App = () => {
                     {todo.title}
                     <button
                       onClick={() => {
-                        handleEditTodo(todo.id, todo.title);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
                         handleDeleteTodo(todo.id);
                       }}
                     >
                       Delete
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleEditTodo(todo.id, todo.title);
+                      }}
+                    >
+                      Edit
                     </button>
                   </div>
                 )}
