@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 interface Email {
   id: string;
@@ -46,9 +46,26 @@ const GmailMockup = () => {
     );
   };
 
-  const handleCheckboxEmail = (email: Email) => {
-    
-  }
+  const handleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string
+  ) => {
+    setSelectedEmailIds(
+      e.target.checked
+        ? [...selectedEmailIds, id]
+        : selectedEmailIds.filter((emailId) => emailId !== id)
+    );
+    console.log("this is working", selectedEmailIds);
+  };
+
+  const toggleReadStatus = () => {
+    setEmails(
+      emails.map((email) => ({
+        ...email,
+        read: selectedEmailIds.includes(email.id) ? "read" : email.read,
+      }))
+    );
+  };
 
   return (
     <div style={{ padding: "0px, 20px" }}>
@@ -58,7 +75,7 @@ const GmailMockup = () => {
       ) : (
         // ** Left Pane **
         <div>
-          <button>Mark As Read</button>
+          <button onClick={toggleReadStatus}>Mark As Read</button>
           <div
             style={{
               display: "flex",
@@ -79,7 +96,10 @@ const GmailMockup = () => {
                     key={email.id}
                   >
                     {email.from} - {email.subject} - {email.time}
-                    <input type="checkbox" />
+                    <input
+                      type="checkbox"
+                      onChange={(e) => handleCheckboxChange(e, email.id)}
+                    />
                     <button onClick={() => handleSelectedEmail(email)}>
                       Select Email
                     </button>
