@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Email {
   id: string;
@@ -29,7 +29,7 @@ const GmailMockup = () => {
         console.log("Big Data", data);
       } catch (error) {
         if (error instanceof Error) {
-          setError;
+          setError("an unknown error has occured");
         }
       } finally {
         setIsLoading(false);
@@ -62,10 +62,14 @@ const GmailMockup = () => {
     setEmails(
       emails.map((email) => ({
         ...email,
-        read: selectedEmailIds.includes(email.id) ? "read" : email.read,
+        read: selectedEmailIds.includes(email.id) ? "true" : email.read,
       }))
     );
   };
+
+  const allSelectedAreRead = selectedEmailIds.every(
+    (id) => emails.find((email) => email.id === id)?.read === "true"
+  );
 
   return (
     <div style={{ padding: "0px, 20px" }}>
@@ -75,7 +79,9 @@ const GmailMockup = () => {
       ) : (
         // ** Left Pane **
         <div>
-          <button onClick={toggleReadStatus}>Mark As Read</button>
+          <button onClick={toggleReadStatus}>
+            {allSelectedAreRead ? "Mark as Unread" : "Mark as read"}
+          </button>
           <div
             style={{
               display: "flex",
@@ -117,11 +123,7 @@ const GmailMockup = () => {
                   <p>{selectedEmail.message}</p>
                 </div>
               ) : (
-                <div>
-                  <p style={{ color: "red" }}>
-                    Please select an email from the list
-                  </p>{" "}
-                </div>
+                <div>{error && <p>{error}</p>}</div>
               )}
             </div>
           </div>
