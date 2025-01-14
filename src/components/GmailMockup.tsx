@@ -8,6 +8,7 @@ interface Email {
   time: string;
   subject: string;
   message: string;
+  read: string;
 }
 
 const GmailMockup = () => {
@@ -41,6 +42,7 @@ const GmailMockup = () => {
 
   const handleSelectedEmail = (email: Email) => {
     setSelectedEmail(email);
+    setError("");
     setEmails(
       emails.map((e) => (e.id === email.id ? { ...email, read: "true" } : e))
     );
@@ -57,6 +59,25 @@ const GmailMockup = () => {
     );
   };
 
+  const toggleReadStatus = () => {
+    const allRead = selectedEmailIds.every(
+      (id) => emails.find((email) => email.id === id)?.read === "true"
+    );
+
+    setEmails(
+      emails.map((email) => ({
+        ...email,
+        read: allRead ? "false" : "true",
+      }))
+    );
+
+    setSelectedEmailIds([]);
+  };
+
+  const allSelectedAreRead = selectedEmailIds.every(
+    (id) => emails.find((email) => email.id === id)?.read === "true"
+  );
+
   return (
     <div>
       <div>
@@ -65,9 +86,18 @@ const GmailMockup = () => {
         ) : (
           <div style={{ display: "flex" }}>
             <div style={{ flex: 1 }}>
+              <button onClick={toggleReadStatus}>
+                {allSelectedAreRead ? "Mark as unread" : "Mark as read"}
+              </button>
               <ul>
                 {emails.map((email) => (
-                  <li key={email.id}>
+                  <li
+                    style={{
+                      backgroundColor:
+                        email.read === "true" ? "#ffffff" : "#ee9cf7",
+                    }}
+                    key={email.id}
+                  >
                     {email.sender} - {email.from} - {email.time}
                     <button onClick={() => handleSelectedEmail(email)}>
                       Select Email
@@ -90,7 +120,9 @@ const GmailMockup = () => {
                   <p>{selectedEmail.message}</p>
                 </div>
               ) : (
-                <div>Please select an email to continue</div>
+                <p style={{ color: "red" }}>
+                  {error || "Please select an email to continue."}
+                </p>
               )}
             </div>
           </div>
