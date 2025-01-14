@@ -57,40 +57,69 @@ const GmailMockup = () => {
     );
   };
 
-  return (
-    <div style={{ display: "flex" }}>
-      <div style={{ flex: 1 }}>
-        <ul>
-          {emails.map((email) => (
-            <>
-              <li
-                style={{
-                  backgroundColor: email.read === "true" ? "#fff" : "#fafa1b",
-                }}
-                key={email.id}
-              >
-                {email.subject} - {email.sender} - {email.time}
-              </li>
-              <button onClick={() => handleSelectedEmail(email)}>
-                Select Email
-              </button>
-              <input type="checkbox" onChange={() => handleCheckboxChange} />
-            </>
-          ))}
-        </ul>
-      </div>
-      <div style={{ flex: 2 }}>
-        {selectedEmail ? (
-          <div>
-            <h3>{selectedEmail.from}</h3>
-            <h3>{selectedEmail.subject}</h3>
+  const toggleReadStatus = () => {
+    setEmails(
+      emails.map((email) => ({
+        ...email,
+        read: selectedEmailIds.includes(email.id) ? "true" : email.read,
+      }))
+    );
+  };
 
-            <p>{selectedEmail.message}</p>
+  const allSelectedAreRead = selectedEmailIds.every(
+    (id) => emails.find((email) => email.id === id)?.read === "true"
+  );
+
+  return (
+    <div>
+      {isLoading ? (
+        <div>Loading....</div>
+      ) : (
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: 1 }}>
+            <button onClick={toggleReadStatus}>
+              {allSelectedAreRead ? "Mark as Unread" : "Mark as Read"}
+            </button>
+            <ul>
+              {emails.map((email) => (
+                <>
+                  <li
+                    style={{
+                      backgroundColor:
+                        email.read === "true" ? "#fff" : "#fafa",
+                    }}
+                    key={email.id}
+                  >
+                    {email.subject} - {email.sender} - {email.time}
+                  </li>
+                  <button onClick={() => handleSelectedEmail(email)}>
+                    Select Email
+                  </button>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleCheckboxChange(e, email.id)}
+                    checked={selectedEmailIds.includes(email.id)}
+                  />
+                </>
+              ))}
+            </ul>
           </div>
-        ) : (
-          <div>KEEP ON FUCKING GRINDING</div>
-        )}
-      </div>
+          <div style={{ flex: 2 }}>
+            {selectedEmail ? (
+              <div>
+                <h3>{selectedEmail.from}</h3>
+                <h3>{selectedEmail.subject}</h3>
+
+                <p>{selectedEmail.message}</p>
+              </div>
+            ) : (
+              <div style={{ color: "red" }}>
+                Select an email to view its details.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
