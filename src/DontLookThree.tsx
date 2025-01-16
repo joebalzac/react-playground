@@ -77,7 +77,6 @@ const GmailMockup = () => {
       {isLoading ? (
         <div>Loading...</div>
       ) : (
-        // ** Left Pane **
         <div>
           <button onClick={toggleReadStatus}>
             {allSelectedAreRead ? "Mark as Unread" : "Mark as read"}
@@ -113,8 +112,6 @@ const GmailMockup = () => {
                 ))}
               </ul>
             </div>
-
-            {/* Right Pane */}
             <div style={{ flex: 2 }}>
               {selectedEmail ? (
                 <div>

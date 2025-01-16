@@ -1,22 +1,23 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Email {
   id: string;
-  from: string;
-  sender: string;
   time: string;
   subject: string;
+  send: string;
+  from: string;
   message: string;
   read: string;
+  sender: string;
 }
 
 const GmailMockup = () => {
   const [emails, setEmails] = useState<Email[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [selectedEmailIds, setSelectedEmailIds] = useState<string[]>([]);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchEmails = async () => {
@@ -30,25 +31,23 @@ const GmailMockup = () => {
         console.log("Big Data", data);
       } catch (error) {
         if (error instanceof Error) {
-          setError;
+          setError("An unknown error has occurred");
         }
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchEmails();
   }, []);
 
   const handleSelectedEmail = (email: Email) => {
     setSelectedEmail(email);
-    setError("");
     setEmails(
       emails.map((e) => (e.id === email.id ? { ...email, read: "true" } : e))
     );
   };
 
-  const handleCheckboxChange = (
+  const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     id: string
   ) => {
@@ -60,18 +59,12 @@ const GmailMockup = () => {
   };
 
   const toggleReadStatus = () => {
-    const allRead = selectedEmailIds.every(
-      (id) => emails.find((email) => email.id === id)?.read === "true"
-    );
-
     setEmails(
       emails.map((email) => ({
         ...email,
-        read: allRead ? "false" : "true",
+        read: selectedEmailIds.includes(email.id) ? "true" : email.read,
       }))
     );
-
-    setSelectedEmailIds([]);
   };
 
   const allSelectedAreRead = selectedEmailIds.every(
@@ -82,9 +75,9 @@ const GmailMockup = () => {
     <div>
       <div>
         {isLoading ? (
-          <div>Loading....</div>
+          <div>isLoading.....</div>
         ) : (
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div style={{ flex: 1 }}>
               <button onClick={toggleReadStatus}>
                 {allSelectedAreRead ? "Mark as unread" : "Mark as read"}
@@ -94,35 +87,31 @@ const GmailMockup = () => {
                   <li
                     style={{
                       backgroundColor:
-                        email.read === "true" ? "#ffffff" : "#ee9cf7",
+                        email.read === "true" ? "#fff" : "#fafab4",
                     }}
                     key={email.id}
                   >
-                    {email.sender} - {email.from} - {email.time}
+                    {email.sender} - {email.from} -{email.time}
                     <button onClick={() => handleSelectedEmail(email)}>
                       Select Email
                     </button>
                     <input
                       type="checkbox"
-                      onChange={(e) => handleCheckboxChange(e, email.id)}
+                      onChange={(e) => handleInputChange(e, email.id)}
                     />
                   </li>
                 ))}
               </ul>
             </div>
-
             <div style={{ flex: 2 }}>
               {selectedEmail ? (
                 <div>
                   <h3>{selectedEmail.from}</h3>
-                  <h4>{selectedEmail.subject}</h4>
-
-                  <p>{selectedEmail.message}</p>
+                  <h3>{selectedEmail.subject}</h3>
+                  <p> {selectedEmail.message}</p>
                 </div>
               ) : (
-                <p style={{ color: "red" }}>
-                  {error || "Please select an email to continue."}
-                </p>
+                <div>Please select an email to conitnue</div>
               )}
             </div>
           </div>
