@@ -84,7 +84,7 @@ const GmailMockup = () => {
               </button>
               <ul>
                 {emails.map((email) => (
-                  <li>
+                  <li key={email.id} style={{backgroundColor: email.read === 'true' ? '#FFFFFF' : '#FFC0CB'}}>
                     <h3>
                       {email.address} - {email.from} - {email.time}
                     </h3>
