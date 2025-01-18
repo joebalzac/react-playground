@@ -70,6 +70,7 @@ const GmailMockup = () => {
   const allSelectedAreRead = selectedEmailIds.every(
     (id) => emails.find((email) => email.id === id)?.read === "true"
   );
+  
 
   return (
     <div style={{ padding: "0px, 20px" }}>

@@ -2,42 +2,42 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface Email {
-  id: string;
-  time: string;
-  subject: string;
-  send: string;
+  address: string;
   from: string;
+  id: string;
   message: string;
+  subject: string;
+  time: string;
   read: string;
-  sender: string;
 }
 
 const GmailMockup = () => {
   const [emails, setEmails] = useState<Email[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [selectedEmailIds, setSelectedEmailIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchEmails = async () => {
+    const fetchTodos = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
           "https://gist.githubusercontent.com/Jsarihan/d5f8cd2d159d676fbfb2fab94750635e/raw/b54cc1bd819b157a93bde00fe059825002f1f602/email.json"
         );
-        const data: Email[] = await response.data;
+        const data = response.data;
         setEmails(data);
-        console.log("Big Data", data);
+        console.log("big data dawg", data);
       } catch (error) {
         if (error instanceof Error) {
-          setError("An unknown error has occurred");
+          setError("There is an unknown error");
         }
       } finally {
         setIsLoading(false);
       }
     };
-    fetchEmails();
+
+    fetchTodos();
   }, []);
 
   const handleSelectedEmail = (email: Email) => {
@@ -75,29 +75,31 @@ const GmailMockup = () => {
     <div>
       <div>
         {isLoading ? (
-          <div>isLoading.....</div>
+          <div>Loading.....</div>
         ) : (
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex" }}>
             <div style={{ flex: 1 }}>
               <button onClick={toggleReadStatus}>
                 {allSelectedAreRead ? "Mark as unread" : "Mark as read"}
               </button>
               <ul>
                 {emails.map((email) => (
-                  <li
-                    style={{
-                      backgroundColor:
-                        email.read === "true" ? "#fff" : "#fafab4",
-                    }}
-                    key={email.id}
-                  >
-                    {email.sender} - {email.from} -{email.time}
-                    <button onClick={() => handleSelectedEmail(email)}>
+                  <li>
+                    <h3>
+                      {email.address} - {email.from} - {email.time}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        handleSelectedEmail(email);
+                      }}
+                    >
                       Select Email
                     </button>
                     <input
                       type="checkbox"
-                      onChange={(e) => handleInputChange(e, email.id)}
+                      onChange={(e) => {
+                        handleInputChange(e, email.id);
+                      }}
                     />
                   </li>
                 ))}
@@ -106,12 +108,12 @@ const GmailMockup = () => {
             <div style={{ flex: 2 }}>
               {selectedEmail ? (
                 <div>
-                  <h3>{selectedEmail.from}</h3>
                   <h3>{selectedEmail.subject}</h3>
-                  <p> {selectedEmail.message}</p>
+                  <h3>{selectedEmail.from}</h3>
+                  <p>{selectedEmail.message}</p>
                 </div>
               ) : (
-                <div>Please select an email to conitnue</div>
+                <div>Please select an email</div>
               )}
             </div>
           </div>
