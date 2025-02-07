@@ -7,6 +7,7 @@ interface Article {
   description: string;
   url: string;
   id: number;
+  read: boolean;
 }
 
 const NewsStories = () => {
@@ -35,7 +36,7 @@ const NewsStories = () => {
         const data = response.data;
         const articlesWithIds = data.articles.map((article: Article) => ({
           ...article,
-          id: Math.floor(Math.random() * 90) + 10,
+          id: `${Math.floor(Math.random() * 90) + 10}-${Date.now()}`,
           read: false,
         }));
         setArticles(articlesWithIds);
@@ -52,7 +53,9 @@ const NewsStories = () => {
 
   const handleSelectedArticle = (article: Article) => {
     setSelectedArticle(article);
-    setArticles(articles.map((article) => ({ ...article, read: true })));
+    setArticles(
+      articles.map((a) => (a.id === article.id ? { ...a, read: true } : a))
+    );
   };
 
   const handleDeleteArticle = (id: number) => {
@@ -71,9 +74,7 @@ const NewsStories = () => {
             <div
               key={article.id}
               className={`p-4 border rounded-lg shadow-lg transition-transform transform hover:scale-105 cursor-pointer ${
-                selectedArticle?.id === article.id
-                  ? "bg-gray-300 border-gray-600"
-                  : "bg-white"
+                article.read ? "bg-gray-300 border-gray-600" : "bg-white"
               }`}
             >
               <h4 className="text-lg font-semibold text-gray-800 mb-2">
