@@ -1,9 +1,9 @@
-import NewsStories from "./components/NewsStories";
+import NewYorkTimes from "./components/NewYorkTimes";
 
 const App = () => {
   return (
     <div>
-      <NewsStories />
+      <NewYorkTimes />
     </div>
   );
 };
