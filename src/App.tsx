@@ -1,9 +1,9 @@
-import NewYorkTimes from "./components/NewYorkTimes";
+import TodoListTwo from "./components/TodoListTwo";
 
 const App = () => {
   return (
-    <div>
-      <NewYorkTimes />
+    <div className="flex items-center justify-center h-full">
+      <TodoListTwo />
     </div>
   );
 };

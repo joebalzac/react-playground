@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Times {
   id: string;
@@ -9,14 +9,13 @@ interface Times {
   url: string;
   uri: string;
   published_date: string;
+  multimedia: [{ url: string }];
 }
 
 const NewYorkTimes = () => {
   const [stories, setStories] = useState<Times[]>([]);
   const [selectedStory, setSelectedStory] = useState<Times | null>(null);
-  const [selectedStoriesIds, setSelectedStoriesIds] = useState<Number | null>(
-    null
-  );
+  const [selectedStoriesIds, setSelectedStoriesIds] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,6 +35,7 @@ const NewYorkTimes = () => {
         const storiesWithIds = data.results.map((result: Times) => ({
           ...result,
           id: result.uri,
+          multimedia: result.multimedia ?? [],
         }));
         setStories(storiesWithIds);
         console.log("big data homie", storiesWithIds);
@@ -54,8 +54,23 @@ const NewYorkTimes = () => {
     setSelectedStory(story);
   };
 
-  const handleDeleteStory = (id: string) => {
+  const handleDeleteStory = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: string
+  ) => {
+    e.stopPropagation();
     setStories(stories.filter((story) => story.id !== id));
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string
+  ) => {
+    setSelectedStoriesIds(
+      e.target.checked
+        ? [...selectedStoriesIds, id]
+        : selectedStoriesIds.filter((storyId) => storyId !== id)
+    );
   };
 
   return (
@@ -67,6 +82,7 @@ const NewYorkTimes = () => {
         <div>Loading.....</div>
       ) : (
         <div className="grid grid-cols-2 gap-8">
+          <input type="text" placeholder="search article" />
           <ul className="grid grid-cols-1 gap-6">
             {stories.map((story, index) => (
               <li
@@ -75,7 +91,12 @@ const NewYorkTimes = () => {
                 onClick={() => handleSelectedStory(story)}
               >
                 <div>
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => handleInputChange(e, story.id)}
+                  />
+                  <img src={story.multimedia[0]?.url} alt="" />
                   <h2 className="text-2xl font-bold leading-tight">
                     {story.title}
                   </h2>
@@ -84,7 +105,7 @@ const NewYorkTimes = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => handleDeleteStory(story.id)}
+                  onClick={(e) => handleDeleteStory(e, story.id)}
                   className="bg-transparent text-red-400 w-full cursor-default hover:bg-red-300"
                 >
                   Delete Article
