@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Todo {
   id: number;
@@ -20,10 +20,10 @@ const TodoListTwo = () => {
       const response = await axios.get(
         "https://jsonplaceholder.typicode.com/todos?_limit=10"
       );
-      const data: Todo[] = response.data;
+      const data: Todo[] = await response.data;
       setTodos(data);
     } catch (error) {
-      setError("An unexpected error has occurred");
+      setError("An unknown error has occurred");
     } finally {
       setIsLoading(false);
     }
@@ -36,13 +36,11 @@ const TodoListTwo = () => {
   const handleAddTodo = () => {
     if (newTodo.trim()) {
       const newTodoItem: Todo = {
-        title: newTodo.trim(),
         id: Date.now(),
+        title: newTodo.trim(),
       };
       setTodos([...todos, newTodoItem]);
       setNewTodo("");
-    } else {
-      setError("Please add a todo");
     }
   };
 
@@ -59,7 +57,7 @@ const TodoListTwo = () => {
     if (editingId !== null && editingText.trim()) {
       setTodos(
         todos.map((todo) =>
-          todo.id === editingId ? { ...todo, title: editingText } : todo
+          editingId === todo.id ? { ...todo, title: editingText } : todo
         )
       );
       setEditingId(null);
@@ -68,7 +66,9 @@ const TodoListTwo = () => {
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 bg-gray-900 text-white rounded-lg shadow-lg">
-      <h1 className="text-2xl font-semibold mb-4 text-center">Modern Todo List</h1>
+      <h1 className="text-2xl font-semibold mb-4 text-center">
+        Modern Todo List
+      </h1>
       {isLoading ? (
         <div className="text-center">Loading...</div>
       ) : (
