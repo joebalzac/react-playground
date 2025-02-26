@@ -1,41 +1,39 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-
-interface Email {
-  address: string;
-  from: string;
-  id: string;
-  subject: string;
-  message: string;
-  time: string;
-  read: string;
-}
+import React, { useEffect, useState } from "react";
 
 const EmailMockup = () => {
   const [emails, setEmails] = useState<Email[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-  const [selectedEmailIds, setSelectedEmailIds] = useState<String[]>([]);
-  const [error, setError] = useState("");
+  const [selectedEmailIds, setSelectedEmailIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  interface Email {
+    id: string;
+    from: string;
+    address: string;
+    time: string;
+    message: string;
+    subject: string;
+    tag: string;
+    read: string;
+  }
+
+  const fetchEmails = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        "https://gist.githubusercontent.com/Jsarihan/d5f8cd2d159d676fbfb2fab94750635e/raw/b54cc1bd819b157a93bde00fe059825002f1f602/email.json"
+      );
+      setEmails(response.data);
+    } catch (error) {
+      setError("An unknown error has occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEmails = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get(
-          "https://gist.githubusercontent.com/Jsarihan/d5f8cd2d159d676fbfb2fab94750635e/raw/b54cc1bd819b157a93bde00fe059825002f1f602/email.json"
-        );
-        const data = response.data;
-        setEmails(data);
-        console.log("Big Data Dog", data);
-      } catch (error) {
-        if (error) {
-          setError("An unknown error occured");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchEmails();
   }, []);
 
@@ -44,7 +42,10 @@ const EmailMockup = () => {
     setEmails(
       emails.map((e) => (e.id === email.id ? { ...email, read: "true" } : e))
     );
-    setError("");
+  };
+
+  const handleDeleteEmail = (id: string) => {
+    setEmails(emails.filter((email) => email.id !== id));
   };
 
   const handleInputChange = (
@@ -62,9 +63,10 @@ const EmailMockup = () => {
     setEmails(
       emails.map((email) => ({
         ...email,
-        read: selectedEmailIds.includes(email.id) ? "true" : email.id,
+        read: selectedEmailIds.includes(email.id) ? "true" : email.read,
       }))
     );
+    setSelectedEmailIds([]);
   };
 
   const allSelectedAreRead = selectedEmailIds.every(
@@ -72,58 +74,82 @@ const EmailMockup = () => {
   );
 
   return (
-    <div style={{ display: "flex" }}>
+    <div className="max-w-4xl mx-auto p-6 bg-gray-900 text-gray-300 min-h-screen">
       {isLoading ? (
-        <div>Loading.....</div>
+        <div className="text-center text-lg font-semibold text-gray-400">
+          Loading...
+        </div>
       ) : (
-        <div style={{ flex: "1" }}>
-          <button
-            onClick={toggleReadStatus}
-            disabled={selectedEmailIds.length === 0}
-          >
-            {allSelectedAreRead ? "Mark as Unread" : "Mark as Read"}
-          </button>
-          <div>
-            <ul>
-              {emails?.map((email) => (
-                <li
-                  style={{
-                    background: email.read === "true" ? "#ffffff" : "#faf3f2",
-                  }}
-                  key={email.id}
-                >
-                  <h3>
-                    {email.address} - {email.subject} - {email.time}
-                  </h3>
-
-                  <button onClick={() => handleSelectedEmail(email)}>
-                    Select Email
-                  </button>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Email List */}
+          <div className="border-r border-gray-700 pr-4">
+            <h2 className="text-xl font-bold mb-4 text-white">Inbox</h2>
+            <button
+              onClick={toggleReadStatus}
+              className="px-4 py-2 text-white rounded-md text-sm bg-green-600 hover:bg-green-500 transition"
+            >
+              {allSelectedAreRead ? "Mark as unread" : "Mark as read"}
+            </button>
+            {emails.map((email) => (
+              <div
+                key={email.id}
+                className={`p-4 rounded-lg shadow-md mb-3 transition-all ${
+                  email.read === "true"
+                    ? "bg-gray-800 border border-gray-600"
+                    : "bg-gray-700 border-l-4 border-blue-500"
+                }`}
+              >
+                <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
-                    onChange={(e) => handleInputChange(e, email.id)}
+                    className="form-checkbox h-4 w-4 text-blue-500"
+                    onChange={(e) => {
+                      handleInputChange(e, email.id);
+                    }}
                   />
-                </li>
-              ))}
-            </ul>
+                  <h3 className="font-semibold text-lg text-white">
+                    {email.from}
+                  </h3>
+                </div>
+                <h5 className="text-gray-400">{email.subject}</h5>
+                <p className="text-sm text-gray-500">{email.time}</p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-500 transition"
+                    onClick={() => handleDeleteEmail(email.id)}
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-500 transition"
+                    onClick={() => handleSelectedEmail(email)}
+                  >
+                    Select
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Selected Email Display */}
+          <div className="pl-4">
+            {selectedEmail ? (
+              <div className="p-6 border border-gray-700 rounded-lg shadow-md bg-gray-800">
+                <h4 className="text-xl font-bold mb-2 text-white">
+                  {selectedEmail.subject}
+                </h4>
+                <p className="text-gray-400">{selectedEmail.message}</p>
+              </div>
+            ) : (
+              <div className="text-gray-500 italic text-center">
+                Please select an email, you coward.
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      <div style={{ flex: "2" }}>
-        {selectedEmail ? (
-          <div>
-            {selectedEmail.subject}
-            <p>{selectedEmail.message}</p>
-          </div>
-        ) : (
-          <div>
-            <h5 style={{ color: "red" }}>
-              {error || "Please select an email"}
-            </h5>
-          </div>
-        )}
-      </div>
+      {error && <div className="text-red-500 text-center mt-4">{error}</div>}
     </div>
   );
 };
