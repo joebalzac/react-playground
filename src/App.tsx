@@ -1,9 +1,9 @@
-import SecurityDashboard from "./components/SecurityDashboard";
+import TodoList from "./components/TodoList";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <SecurityDashboard />
+      <TodoList />
     </div>
   );
 };

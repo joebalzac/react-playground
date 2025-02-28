@@ -5,7 +5,7 @@ interface Todo {
   title: string;
 }
 
-const App = () => {
+const TodoList = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -125,4 +125,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default TodoList;
