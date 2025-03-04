@@ -64,7 +64,7 @@ const GmailMockup = () => {
     setEmails(
       emails.map((email) => ({
         ...email,
-        read: selectedEmailIds.includes(email.id) ? "true" : email.read,
+        read: selectedEmailIds.includes(email.id) ? "true" : email.id,
       }))
     );
     setSelectedEmailIds([]);

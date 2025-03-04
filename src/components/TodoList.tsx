@@ -56,11 +56,13 @@ const TodoList = () => {
   };
 
   const handleSaveTodo = () => {
-    setTodos(
-      todos.map((todo) =>
-        editingId === todo.id ? { ...todo, title: editingText } : todo
-      )
-    );
+    if (editingId !== null && editingText.trim()) {
+      setTodos(
+        todos.map((todo) =>
+          editingId === todo.id ? { ...todo, title: editingText } : todo
+        )
+      );
+    }
     setEditingId(null);
   };
 
