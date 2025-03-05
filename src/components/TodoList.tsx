@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 interface Todo {
   id: number;
   title: string;
-  completed: boolean;
 }
 
 const TodoList = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
-  const [editingId, setEditingId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,7 +23,9 @@ const TodoList = () => {
       const data: Todo[] = response.data;
       setTodos(data);
     } catch (error) {
-      setError("An unknown error has occurred");
+      if (error) {
+        setError("An unknown error has occureed");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -39,7 +40,6 @@ const TodoList = () => {
       const newTodoItem: Todo = {
         id: Date.now(),
         title: newTodo.trim(),
-        completed: false,
       };
       setTodos([...todos, newTodoItem]);
       setNewTodo("");
@@ -59,54 +59,49 @@ const TodoList = () => {
     if (editingId !== null && editingText.trim()) {
       setTodos(
         todos.map((todo) =>
-          editingId === todo.id ? { ...todo, title: editingText } : todo
+          todo.id === editingId ? { ...todo, title: editingText } : todo
         )
       );
+      setEditingId(null);
     }
-    setEditingId(null);
   };
 
   return (
     <div>
-      {isLoading ? (
-        <div>Loading....</div>
-      ) : (
-        <div>
-          <input
-            type="text"
-            value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
-          />
-          <button onClick={handleAddTodo}>Add Todo +</button>
-          <ul>
-            {todos.map((todo) => (
-              <li key={todo.id}>
-                {editingId === todo.id ? (
-                  <div>
-                    <input
-                      type="text"
-                      value={editingText}
-                      onChange={(e) => setEditingText(e.target.value)}
-                    />
-                    <button onClick={handleSaveTodo}>Save</button>
-                  </div>
-                ) : (
-                  <div>
-                    {todo.title}
-                    <button onClick={() => handleDeleteTodo(todo.id)}>
-                      Delete
-                    </button>
-                    <button onClick={() => handleEditTodo(todo.id, todo.title)}>
-                      Edit
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-        </div>
-      )}
+      <div>
+        {isLoading ? (
+          <div>Loading....</div>
+        ) : (
+          <div>
+            <input type="text" value={newTodo} onChange={handleAddTodo} />
+            <ul>
+              {todos.map((todo) => (
+                <li key={todo.id}>
+                  {editingId === todo.id ? (
+                    <div>
+                      <input
+                        type="text"
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                      />
+                      <button onClick={handleSaveTodo}>Save</button>
+                    </div>
+                  ) : (
+                    <div>
+                      {todo.title}
+                      <button onClick={() => handleDeleteTodo(todo.id)}>
+                        Delete
+                      </button>
+                      <button onClick={() => handleEditTodo}>Edit</button>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+      {error && <p>Please add an error to this</p>}
     </div>
   );
 };
