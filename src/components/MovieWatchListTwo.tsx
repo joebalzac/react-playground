@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const API_KEY = "585e3c362f1184df6a46acc6594ad300";
 const SCI_FI_GENRE_ID = [878, 53, 80, 28];
@@ -20,6 +20,9 @@ const MovieWatchListTwo = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selectedMovies, setSelectedMovies] = useState<Movie[]>([]);
   const [selectedMovieIds, setSelectedMovieIds] = useState<number[]>([]);
+  const [addedMovieIds, setAddedMovieIds] = useState<Number[]>([]);
+  const [editingTitle, setEditingTitle] = useState("");
+  const [editingTitleId, setEditingTitleId] = useState<number | null>(null);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -78,6 +81,25 @@ const MovieWatchListTwo = () => {
 
   const handleDeleteMovie = (id: number) => {
     setMovies(movies.filter((movie) => movie.id !== id));
+    setSelectedMovies(selectedMovies.filter((movie) => movie.id !== id));
+  };
+
+  const handleEditTitle = (title: string, id: number) => {
+    setEditingTitle(title);
+    setEditingTitleId(id);
+  };
+
+  const handleSaveEditTitle = () => {
+    if (editingTitleId !== null && editingTitle.trim()) {
+      setMovies(
+        movies.map((movie) =>
+          movie.id === editingTitleId
+            ? { ...movie, title: editingTitle }
+            : movie
+        )
+      );
+      setEditingTitleId(null);
+    }
   };
 
   const handleInputChange = (
@@ -91,6 +113,8 @@ const MovieWatchListTwo = () => {
     );
   };
 
+  // Handle all functions
+
   const addCheckedMovies = () => {
     setSelectedMovies(
       movies.filter((movie) => selectedMovieIds.includes(movie.id))
@@ -98,9 +122,32 @@ const MovieWatchListTwo = () => {
     setSelectedMovieIds([]);
   };
 
-  const deleteAllMovies = () => {
+  const deleteCheckedMovies = () => {
     setMovies(movies.filter((movie) => !selectedMovieIds.includes(movie.id)));
     setSelectedMovieIds([]);
+  };
+
+  // Selected Movie Section
+
+  const handleRemoveMovie = (id: number) => {
+    setSelectedMovies(selectedMovies.filter((movie) => movie.id !== id));
+  };
+
+  const handleAddedMovieInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: number
+  ) => {
+    setAddedMovieIds(
+      e.target.checked
+        ? [...addedMovieIds, id]
+        : addedMovieIds.filter((addedMovieId) => addedMovieId !== id)
+    );
+  };
+
+  const handleRemoveAllSelectedMovies = () => {
+    setSelectedMovies(
+      selectedMovies.filter((movieId) => !addedMovieIds.includes(movieId.id))
+    );
   };
 
   return (
@@ -111,21 +158,32 @@ const MovieWatchListTwo = () => {
         <div className="grid grid-cols-2">
           <div>
             <button onClick={addCheckedMovies}>Add Movies</button>
-            <button onClick={deleteAllMovies}>Delete Movies</button>
+            <button onClick={deleteCheckedMovies}>Delete Movies</button>
             <ul className="grid grid-cols-3">
               {movies.map((movie) => {
                 const genreNames = movie.genre_ids
                   .map((id) => genres.find((genre) => genre.id === id)?.name)
                   .filter(Boolean)
                   .join(",");
-
                 return (
                   <li key={movie.id}>
                     <img
                       src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
                       alt={movie.title}
                     />
-                    {movie.title}
+                    {editingTitleId === movie.id ? (
+                      <div>
+                        <input
+                          type="text"
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                        />
+                        <button onClick={handleSaveEditTitle}>Save</button>
+                      </div>
+                    ) : (
+                      <div>{movie.title}</div>
+                    )}
+
                     <ul>
                       <li>{genreNames}</li>
                     </ul>
@@ -140,6 +198,11 @@ const MovieWatchListTwo = () => {
                     <button onClick={() => handleDeleteMovie(movie.id)}>
                       Delete
                     </button>
+                    <button
+                      onClick={() => handleEditTitle(movie.title, movie.id)}
+                    >
+                      Edit
+                    </button>
                   </li>
                 );
               })}
@@ -148,13 +211,26 @@ const MovieWatchListTwo = () => {
           <div>
             {selectedMovies ? (
               <div>
-                {selectedMovies.map((movie) => (
-                  <li key={movie.id}>
+                <button onClick={() => handleRemoveAllSelectedMovies()}>
+                  Remove all selected movies
+                </button>
+                {selectedMovies.map((selectedMovie) => (
+                  <li key={selectedMovie.id}>
                     <img
-                      src={`https://image.tmdb.org/t/p/w500/${movie.backdrop_path}`}
-                      alt={movie.title}
+                      src={`https://image.tmdb.org/t/p/w500/${selectedMovie.backdrop_path}`}
+                      alt={selectedMovie.title}
                     />
-                    {movie.title}
+                    {selectedMovie.title}
+                    <input
+                      type="checkbox"
+                      checked={addedMovieIds.includes(selectedMovie.id)}
+                      onChange={(e) =>
+                        handleAddedMovieInputChange(e, selectedMovie.id)
+                      }
+                    />
+                    <button onClick={() => handleRemoveMovie(selectedMovie.id)}>
+                      Remove
+                    </button>
                   </li>
                 ))}
               </div>
@@ -162,6 +238,7 @@ const MovieWatchListTwo = () => {
               <div>Please add a movie to the list</div>
             )}
           </div>
+          {error && <p className="text-red-400">{error}</p>}
         </div>
       )}
     </div>
