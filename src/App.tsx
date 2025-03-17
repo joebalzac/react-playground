@@ -1,9 +1,9 @@
-import MovieWatchlist from "./components/MovieWatchlist";
+import MovieWatchListTwo from "./components/MovieWatchListTwo";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <MovieWatchlist />
+      <MovieWatchListTwo />
     </div>
   );
 };
