@@ -1,9 +1,9 @@
-import MovieWatchListTwo from "./components/MovieWatchListTwo";
+import TodoList from "./components/TodoList";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <MovieWatchListTwo />
+      <TodoList />
     </div>
   );
 };
