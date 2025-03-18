@@ -1,9 +1,10 @@
-import TodoList from "./components/TodoList";
+import GmailMockupTwo from "./components/GmailMockupTwo";
+
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <TodoList />
+      <GmailMockupTwo />
     </div>
   );
 };

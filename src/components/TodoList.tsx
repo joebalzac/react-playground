@@ -43,6 +43,7 @@ const TodoList = () => {
           todo.id === editingId ? { ...todo, title: editingText } : todo
         )
       );
+      setEditingId(null);
     }
   };
 
@@ -65,7 +66,7 @@ const TodoList = () => {
                   value={editingText}
                   onChange={(e) => setEditingText(e.target.value)}
                 />
-                <button onClick={() => handleSaveTodo}>Save</button>
+                <button onClick={handleSaveTodo}>Save</button>
               </div>
             ) : (
               <div>
