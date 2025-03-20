@@ -20,10 +20,10 @@ const GmailMockupTwo = () => {
   const fetchEmails = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get(
+      const res = await fetch(
         "https://gist.githubusercontent.com/Jsarihan/d5f8cd2d159d676fbfb2fab94750635e/raw/b54cc1bd819b157a93bde00fe059825002f1f602/email.json"
       );
-      const data: Email[] = await res.data;
+      const data: Email[] = await res.json();
       setEmails(data);
       console.log("Big data dog", data);
     } catch (error) {

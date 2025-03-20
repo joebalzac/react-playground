@@ -1,10 +1,9 @@
-import GmailMockupTwo from "./components/GmailMockupTwo";
-
+import AdvancedTodoList from "./components/Advanced/AdvancedTodoList";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <GmailMockupTwo />
+      <AdvancedTodoList />
     </div>
   );
 };
