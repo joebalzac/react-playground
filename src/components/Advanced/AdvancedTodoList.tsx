@@ -67,7 +67,10 @@ const AdvancedTodoList = () => {
     setEditingId(null);
   };
 
-  const handleToggleTodo = (e: React.MouseEvent<HTMLLIElement>, id: number) => {
+  const handleToggleTodo = (
+    e: React.MouseEvent<HTMLHeadingElement>,
+    id: number
+  ) => {
     e.preventDefault();
     setTodos(
       sortTodos(
@@ -77,6 +80,17 @@ const AdvancedTodoList = () => {
       )
     );
   };
+
+  useEffect(() => {
+    const storedTodos = localStorage.getItem("advancedTodos");
+    if (storedTodos) {
+      setTodos(sortTodos(JSON.parse(storedTodos)));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("advancedTodos", JSON.stringify(todos));
+  }, [todos]);
 
   return (
     <div>
@@ -93,7 +107,6 @@ const AdvancedTodoList = () => {
             className={`group relative border-2 border-gray-600 cursor-pointer my-2 p-2 ${
               todo.completed ? "bg-white line-through" : "bg-yellow-200"
             }`}
-            onClick={(e) => handleToggleTodo(e, todo.id)}
             onMouseOver={() => setIsHovered(true)}
           >
             {editingId === todo.id ? (
@@ -101,14 +114,28 @@ const AdvancedTodoList = () => {
                 <input
                   type="text"
                   value={editingText}
-                  onChange={(e) => setEditingText(e.target.value)}
+                  onChange={(e) => {
+                    setEditingText(e.target.value);
+                  }}
                 />
                 <button onClick={handleSaveTodo}>Save Todo</button>
               </div>
             ) : (
               <div>
-                <h3>{todo.title}</h3>
-                <button onClick={() => handleEditTodo(todo.id, todo.title)}>
+                <h3
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleTodo(e, todo.id);
+                  }}
+                >
+                  {todo.title}
+                </h3>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditTodo(todo.id, todo.title);
+                  }}
+                >
                   Edit
                 </button>
               </div>
