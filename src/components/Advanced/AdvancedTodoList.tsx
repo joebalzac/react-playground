@@ -11,17 +11,29 @@ const AdvancedTodoList = () => {
   const [newTodo, setNewTodo] = useState("");
   const [editingText, setEditingText] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [hoverTodoId, setHoverTodoId] = useState<number | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
   const fetchTodos = async () => {
     fetch("https://jsonplaceholder.typicode.com/todos?_limit=10")
       .then((res) => res.json())
-      .then((data) => setTodos(data));
+      .then((data) =>
+        setTodos(
+          sortTodos(
+            data.sort((a: Todo, b: Todo) => a.title.localeCompare(b.title))
+          )
+        )
+      );
   };
 
   useEffect(() => {
     fetchTodos();
   }, []);
-  console.log("Big data dog", todos);
+
+  const sortTodos = (todoList: Todo[]) => {
+    return [...todoList].sort((a, b) => {
+      return a.completed === b.completed ? 0 : a.completed ? 1 : -1;
+    });
+  };
 
   const handleAddTodo = () => {
     if (newTodo.trim()) {
@@ -30,13 +42,13 @@ const AdvancedTodoList = () => {
         title: newTodo.trim(),
         completed: false,
       };
-      setTodos([...todos, newTodoItem]);
+      setTodos(sortTodos([...todos, newTodoItem]));
       setNewTodo("");
     }
   };
 
   const handleDeleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+    setTodos(sortTodos(todos.filter((todo) => todo.id !== id)));
   };
 
   const handleEditTodo = (id: number, title: string) => {
@@ -58,8 +70,10 @@ const AdvancedTodoList = () => {
   const handleToggleTodo = (e: React.MouseEvent<HTMLLIElement>, id: number) => {
     e.preventDefault();
     setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      sortTodos(
+        todos.map((todo) =>
+          todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        )
       )
     );
   };
@@ -72,53 +86,48 @@ const AdvancedTodoList = () => {
         onChange={(e) => setNewTodo(e.target.value)}
       />
       <button onClick={handleAddTodo}>Add Todo +</button>
-      <div>
-        <ul>
-          {todos.map((todo) => (
-            <>
-              <li
-                className={`relative border-2 border-gray-600 cursor-pointer my-2 ${
-                  todo.completed === true
-                    ? "bg-white line-through"
-                    : "bg-yellow-200"
-                } `}
-                onMouseOver={() => setHoverTodoId(todo.id)}
-                onMouseOut={() => setHoverTodoId(null)}
-                onClick={(e) => handleToggleTodo(e, todo.id)}
+      <ul>
+        {todos.map((todo) => (
+          <li
+            key={todo.id}
+            className={`group relative border-2 border-gray-600 cursor-pointer my-2 p-2 ${
+              todo.completed ? "bg-white line-through" : "bg-yellow-200"
+            }`}
+            onClick={(e) => handleToggleTodo(e, todo.id)}
+            onMouseOver={() => setIsHovered(true)}
+          >
+            {editingId === todo.id ? (
+              <div>
+                <input
+                  type="text"
+                  value={editingText}
+                  onChange={(e) => setEditingText(e.target.value)}
+                />
+                <button onClick={handleSaveTodo}>Save Todo</button>
+              </div>
+            ) : (
+              <div>
+                <h3>{todo.title}</h3>
+                <button onClick={() => handleEditTodo(todo.id, todo.title)}>
+                  Edit
+                </button>
+              </div>
+            )}
+
+            {isHovered && (
+              <button
+                className="absolute right-2 bottom-2 bg-transparent border-2 border-red-100 hidden group-hover:block"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteTodo(todo.id);
+                }}
               >
-                {editingId === todo.id ? (
-                  <div>
-                    <input
-                      type="text"
-                      value={editingText}
-                      onChange={(e) => setEditingText(e.target.value)}
-                    />
-                    <button onClick={handleSaveTodo}>Save Todo</button>
-                  </div>
-                ) : (
-                  <div>
-                    <h3>{todo.title}</h3>
-                    <button onClick={() => handleEditTodo(todo.id, todo.title)}>
-                      Edit
-                    </button>
-                  </div>
-                )}
-                {hoverTodoId === todo.id && (
-                  <button
-                    className="absolute right-0 bottom-0 bg-transparent border-2 border-red-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteTodo(todo.id);
-                    }}
-                  >
-                    X
-                  </button>
-                )}
-              </li>
-            </>
-          ))}
-        </ul>
-      </div>
+                X
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
