@@ -26,7 +26,20 @@ const AdvancedTodoList = () => {
   };
 
   useEffect(() => {
-    fetchTodos();
+    if (todos.length > 0) {
+      localStorage.setItem("advancedTodos", JSON.stringify(todos));
+    }
+  }, [todos]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("advancedTodos");
+    const todosFromStorage: Todo[] = stored ? JSON.parse(stored) : [];
+
+    if (todosFromStorage.length) {
+      setTodos(sortTodos(todosFromStorage));
+    } else {
+      fetchTodos();
+    }
   }, []);
 
   const sortTodos = (todoList: Todo[]) => {
@@ -80,17 +93,6 @@ const AdvancedTodoList = () => {
       )
     );
   };
-
-  useEffect(() => {
-    const storedTodos = localStorage.getItem("advancedTodos");
-    if (storedTodos) {
-      setTodos(sortTodos(JSON.parse(storedTodos)));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("advancedTodos", JSON.stringify(todos));
-  }, [todos]);
 
   return (
     <div>
