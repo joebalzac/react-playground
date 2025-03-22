@@ -12,6 +12,7 @@ const AdvancedTodoList = () => {
   const [editingText, setEditingText] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchTodos = async () => {
     fetch("https://jsonplaceholder.typicode.com/todos?_limit=10")
@@ -96,66 +97,81 @@ const AdvancedTodoList = () => {
 
   return (
     <div>
-      <input
-        type="text"
-        value={newTodo}
-        onChange={(e) => setNewTodo(e.target.value)}
-      />
-      <button onClick={handleAddTodo}>Add Todo +</button>
-      <ul>
-        {todos.map((todo) => (
-          <li
-            key={todo.id}
-            className={`group relative border-2 border-gray-600 cursor-pointer my-2 p-2 ${
-              todo.completed ? "bg-white line-through" : "bg-yellow-200"
-            }`}
-            onMouseOver={() => setIsHovered(true)}
-          >
-            {editingId === todo.id ? (
-              <div>
-                <input
-                  type="text"
-                  value={editingText}
-                  onChange={(e) => {
-                    setEditingText(e.target.value);
-                  }}
-                />
-                <button onClick={handleSaveTodo}>Save Todo</button>
-              </div>
-            ) : (
-              <div>
-                <h3
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggleTodo(e, todo.id);
-                  }}
-                >
-                  {todo.title}
-                </h3>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditTodo(todo.id, todo.title);
-                  }}
-                >
-                  Edit
-                </button>
-              </div>
-            )}
+      <div className="flex justify-between items-center">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-blue-950 rounded-sm py-2 px-8"
+        />
+        <button>Search Todos</button>
 
-            {isHovered && (
-              <button
-                className="absolute right-2 bottom-2 bg-transparent border-2 border-red-100 hidden group-hover:block"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteTodo(todo.id);
-                }}
-              >
-                X
-              </button>
-            )}
-          </li>
-        ))}
+        <input
+          type="text"
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          className="border border-blue-950 rounded-sm py-2 px-8"
+        />
+        <button onClick={handleAddTodo}>Add Todo +</button>
+      </div>
+      <ul>
+        {todos
+          .filter((todo) =>
+            todo.title.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+          .map((todo) => (
+            <li
+              key={todo.id}
+              className={`group relative border-2 border-gray-600 cursor-pointer my-2 p-2 ${
+                todo.completed ? "bg-white line-through" : "bg-yellow-200"
+              }`}
+              onMouseOver={() => setIsHovered(true)}
+            >
+              {editingId === todo.id ? (
+                <div>
+                  <input
+                    type="text"
+                    value={editingText}
+                    onChange={(e) => {
+                      setEditingText(e.target.value);
+                    }}
+                  />
+                  <button onClick={handleSaveTodo}>Save Todo</button>
+                </div>
+              ) : (
+                <div>
+                  <h3
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleTodo(e, todo.id);
+                    }}
+                  >
+                    {todo.title}
+                  </h3>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditTodo(todo.id, todo.title);
+                    }}
+                  >
+                    Edit
+                  </button>
+                </div>
+              )}
+
+              {isHovered && (
+                <button
+                  className="absolute right-2 bottom-2 bg-transparent border-2 border-red-100 hidden group-hover:block"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteTodo(todo.id);
+                  }}
+                >
+                  X
+                </button>
+              )}
+            </li>
+          ))}
       </ul>
     </div>
   );
