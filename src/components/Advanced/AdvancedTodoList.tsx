@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 interface Todo {
   id: number;
@@ -11,31 +12,36 @@ const AdvancedTodoList = () => {
   const [newTodo, setNewTodo] = useState("");
   const [editingText, setEditingText] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState<number | null>(null);
 
   const fetchTodos = async () => {
-    fetch("https://jsonplaceholder.typicode.com/todos?_limit=10")
-      .then((res) => res.json())
-      .then((data) =>
-        setTodos(
-          sortTodos(
-            data.sort((a: Todo, b: Todo) => a.title.localeCompare(b.title))
-          )
+    try {
+      setIsLoading(true);
+      const res = await axios.get(
+        "https://jsonplaceholder.typicode.com/todos?_limit=10"
+      );
+      const data: Todo[] = await res.data;
+      setTodos(
+        sortTodos(
+          data.sort((a: Todo, b: Todo) => a.title.localeCompare(b.title))
         )
       );
+    } catch (error) {
+      setError("An unknown error has occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  useEffect(() => {
-    if (todos.length > 0) {
-      localStorage.setItem("advancedTodos", JSON.stringify(todos));
-    }
-  }, [todos]);
+  if (todos.length > 0) {
+    localStorage.setItem("advancedTodos", JSON.stringify(todos));
+  }
 
   useEffect(() => {
     const stored = localStorage.getItem("advancedTodos");
     const todosFromStorage: Todo[] = stored ? JSON.parse(stored) : [];
-
     if (todosFromStorage.length) {
       setTodos(sortTodos(todosFromStorage));
     } else {
@@ -44,9 +50,9 @@ const AdvancedTodoList = () => {
   }, []);
 
   const sortTodos = (todoList: Todo[]) => {
-    return [...todoList].sort((a, b) => {
-      return a.completed === b.completed ? 0 : a.completed ? 1 : -1;
-    });
+    return [...todoList].sort(
+      (a, b) => Number(a.completed) - Number(b.completed)
+    );
   };
 
   const handleAddTodo = () => {
@@ -62,7 +68,7 @@ const AdvancedTodoList = () => {
   };
 
   const handleDeleteTodo = (id: number) => {
-    setTodos(sortTodos(todos.filter((todo) => todo.id !== id)));
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   const handleEditTodo = (id: number, title: string) => {
@@ -71,13 +77,11 @@ const AdvancedTodoList = () => {
   };
 
   const handleSaveTodo = () => {
-    if (editingId !== null && editingText.trim()) {
-      setTodos(
-        todos.map((todo) =>
-          todo.id === editingId ? { ...todo, title: editingText } : todo
-        )
-      );
-    }
+    setTodos(
+      todos.map((todo) =>
+        todo.id === editingId ? { ...todo, title: editingText } : todo
+      )
+    );
     setEditingId(null);
   };
 
@@ -97,82 +101,77 @@ const AdvancedTodoList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-blue-950 rounded-sm py-2 px-8"
-        />
-        <button>Search Todos</button>
-
-        <input
-          type="text"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          className="border border-blue-950 rounded-sm py-2 px-8"
-        />
-        <button onClick={handleAddTodo}>Add Todo +</button>
+      <div>
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <div>
+            <input
+              type="text"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+            />
+            <button onClick={handleAddTodo}>Add +</button>
+            <div>
+              {todos.map((todo) => {
+                return (
+                  <li
+                    className={`${
+                      todo.completed === true
+                        ? "line-through bg-white"
+                        : "bg-amber-200"
+                    } relative list-none my-4 rounded-sm shadow`}
+                    onMouseEnter={() => setIsHovered(todo.id)}
+                  >
+                    {editingId === todo.id ? (
+                      <div className="border">
+                        <input
+                          type="text"
+                          value={editingText}
+                          onChange={(e) => setEditingText(e.target.value)}
+                        />
+                        <button onClick={handleSaveTodo}>Save</button>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3
+                          className="cursor-pointer hover:font-bold"
+                          onClick={(e) => handleToggleTodo(e, todo.id)}
+                        >
+                          {todo.title}
+                        </h3>
+                        <button
+                          onClick={() => handleEditTodo(todo.id, todo.title)}
+                        >
+                          Edit
+                        </button>
+                        {isHovered === todo.id && (
+                          <div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteTodo(todo.id);
+                              }}
+                              style={{
+                                position: "absolute",
+                                right: "2px",
+                                bottom: "2px",
+                              }}
+                            >
+                              X
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {error && <p>{error}</p>}
       </div>
-      <ul>
-        {todos
-          .filter((todo) =>
-            todo.title.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((todo) => (
-            <li
-              key={todo.id}
-              className={`group relative border-2 border-gray-600 cursor-pointer my-2 p-2 ${
-                todo.completed ? "bg-white line-through" : "bg-yellow-200"
-              }`}
-              onMouseOver={() => setIsHovered(true)}
-            >
-              {editingId === todo.id ? (
-                <div>
-                  <input
-                    type="text"
-                    value={editingText}
-                    onChange={(e) => {
-                      setEditingText(e.target.value);
-                    }}
-                  />
-                  <button onClick={handleSaveTodo}>Save Todo</button>
-                </div>
-              ) : (
-                <div>
-                  <h3
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleTodo(e, todo.id);
-                    }}
-                  >
-                    {todo.title}
-                  </h3>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditTodo(todo.id, todo.title);
-                    }}
-                  >
-                    Edit
-                  </button>
-                </div>
-              )}
-
-              {isHovered && (
-                <button
-                  className="absolute right-2 bottom-2 bg-transparent border-2 border-red-100 hidden group-hover:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteTodo(todo.id);
-                  }}
-                >
-                  X
-                </button>
-              )}
-            </li>
-          ))}
-      </ul>
     </div>
   );
 };
