@@ -1,9 +1,9 @@
-import AdvancedTodoList from "./components/Advanced/AdvancedTodoList";
+import ImageCarousel from "./components/Advanced/ImageCarousel";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <AdvancedTodoList />
+      <ImageCarousel />
     </div>
   );
 };
