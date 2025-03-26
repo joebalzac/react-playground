@@ -1,9 +1,9 @@
-import ImageCarousel from "./components/Advanced/ImageCarousel";
+import SocialMediaPost from "./components/SocialMediaPost";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <ImageCarousel />
+      <SocialMediaPost />
     </div>
   );
 };

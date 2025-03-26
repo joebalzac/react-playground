@@ -27,15 +27,23 @@ export default function App() {
 
   useEffect(() => {
     Promise.all([
-      fetch("https://jsonplaceholder.typicode.com/posts").then((res) => res.json()),
-      fetch("https://jsonplaceholder.typicode.com/users").then((res) => res.json()),
-      fetch("https://jsonplaceholder.typicode.com/comments").then((res) => res.json()),
+      fetch("https://jsonplaceholder.typicode.com/posts").then((res) =>
+        res.json()
+      ),
+      fetch("https://jsonplaceholder.typicode.com/users").then((res) =>
+        res.json()
+      ),
+      fetch("https://jsonplaceholder.typicode.com/comments").then((res) =>
+        res.json()
+      ),
     ]).then(([postsData, usersData, commentsData]) => {
       setPosts(postsData);
       setUsers(usersData);
       setComments(commentsData);
     });
   }, []);
+
+  
 
   const handlePostClick = (postId: number) => {
     setSelectedPostId(postId);
@@ -45,7 +53,9 @@ export default function App() {
     <ul>
       {posts.map((post) => {
         const author = users.find((user) => user.id === post.id);
-        const postComments = comments.filter((comment) => comment.postId === post.id);
+        const postComments = comments.filter(
+          (comment) => comment.postId === post.id
+        );
 
         return (
           <li key={post.id} onClick={() => handlePostClick(post.id)}>
