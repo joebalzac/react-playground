@@ -1,22 +1,21 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface Post {
-  userId: number;
   id: number;
   title: string;
+  body: string;
 }
 
 interface User {
   id: number;
   name: string;
-  username: string;
 }
 
 interface Comment {
   postId: number;
   id: number;
   name: string;
+  email: string;
 }
 
 const SocialMediaPost = () => {
@@ -27,26 +26,21 @@ const SocialMediaPost = () => {
 
   useEffect(() => {
     Promise.all([
-      axios
-        .get("https://jsonplaceholder.typicode.com/posts")
-        .then((res) => res)
-        .then((data) => data),
-      axios
-        .get("https://jsonplaceholder.typicode.com/users")
-        .then((res) => res)
-        .then((data) => data),
-      axios
-        .get("https://jsonplaceholder.typicode.com/comments")
-        .then((res) => res)
-        .then((data) => data),
+      fetch("https://jsonplaceholder.typicode.com/posts").then((res) =>
+        res.json()
+      ),
+      fetch("https://jsonplaceholder.typicode.com/users").then((res) =>
+        res.json()
+      ),
+      fetch("https://jsonplaceholder.typicode.com/comments").then((res) =>
+        res.json()
+      ),
     ]).then(([postsData, usersData, commentsData]) => {
-      setPosts(postsData.data);
-      setUsers(usersData.data);
-      setComments(commentsData.data);
+      setPosts(postsData);
+      setUsers(usersData);
+      setComments(commentsData);
     });
   }, []);
-
-  console.log("here is the data", posts, users, comments);
 
   const handleSelectedPost = (id: number) => {
     setSelectedPost(id);
@@ -56,17 +50,14 @@ const SocialMediaPost = () => {
     <div>
       {posts.map((post) => {
         const author = users.find((user) => user.id === post.id);
-        const postComment = comments.find((comment) => comment.id === post.id);
+        const commentTitle = comments.find((comment) => comment.id === post.id);
+
         return (
-          <div key={post.id}>
-            {post.title}
-            <button onClick={() => handleSelectedPost(post.id)}>
-              Select Post
-            </button>
-            {selectedPost === post.id && <div>{postComment?.name}</div>}
-            <p>
-              {author?.name} - {author?.username}
-            </p>
+          <div>
+            <h3>{post.title}</h3>
+            <button onClick={() => handleSelectedPost(post.id)}>Select</button>
+            {selectedPost === post.id && <div>{commentTitle?.name}</div>}
+            <p>{author?.name}</p>
           </div>
         );
       })}
