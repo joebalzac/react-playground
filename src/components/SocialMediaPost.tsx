@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Post {
+  userId: number;
   id: number;
   title: string;
   body: string;
@@ -9,13 +10,15 @@ interface Post {
 interface User {
   id: number;
   name: string;
+  username: string;
+  email: string;
 }
 
 interface Comment {
   postId: number;
-  id: number;
   name: string;
   email: string;
+  body: string;
 }
 
 const SocialMediaPost = () => {
@@ -35,10 +38,10 @@ const SocialMediaPost = () => {
       fetch("https://jsonplaceholder.typicode.com/comments").then((res) =>
         res.json()
       ),
-    ]).then(([postsData, usersData, commentsData]) => {
-      setPosts(postsData);
-      setUsers(usersData);
-      setComments(commentsData);
+    ]).then(([postData, userData, commentData]) => {
+      setPosts(postData);
+      setUsers(userData);
+      setComments(commentData);
     });
   }, []);
 
@@ -48,19 +51,28 @@ const SocialMediaPost = () => {
 
   return (
     <div>
-      {posts.map((post) => {
-        const author = users.find((user) => user.id === post.id);
-        const commentTitle = comments.find((comment) => comment.id === post.id);
+      <div>
+        {posts.map((post) => {
+          const authors = users.find((user) => user.id === post.id);
+          const postComment = comments.find(
+            (postComment) => postComment.postId === post.id
+          );
 
-        return (
-          <div>
-            <h3>{post.title}</h3>
-            <button onClick={() => handleSelectedPost(post.id)}>Select</button>
-            {selectedPost === post.id && <div>{commentTitle?.name}</div>}
-            <p>{author?.name}</p>
-          </div>
-        );
-      })}
+          return (
+            <div>
+              <div>
+                {post.title}
+                <h3>{authors?.name}</h3>
+                {selectedPost === post.id && <div>{postComment?.name}</div>}
+                <p>{post.body}</p>
+                <button onClick={() => handleSelectedPost(post.id)}>
+                  Select Post
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
