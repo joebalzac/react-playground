@@ -64,7 +64,7 @@ const MovieWatchlist = () => {
             params: { api_key: API_KEY },
           }
         );
-        setGenres(res.data.genres || []); // FIXED
+        setGenres(res.data.genres || []);
       } catch (error) {
         setError("Failed to fetch genres");
       }
