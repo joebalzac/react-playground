@@ -43,8 +43,6 @@ export default function App() {
     });
   }, []);
 
-  
-
   const handlePostClick = (postId: number) => {
     setSelectedPostId(postId);
   };
