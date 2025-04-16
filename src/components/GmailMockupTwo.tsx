@@ -1,25 +1,38 @@
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 interface Email {
   id: string;
   from: string;
+  address: string;
   subject: string;
-  message: string;
   time: string;
+  message: string;
   read: string;
 }
 
 const GmailMockupTwo = () => {
   const [emails, setEmails] = useState<Email[]>([]);
-  const [selectedEmail, setSelectedEmail] = useState<Email[]>([]);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [selectedEmailIds, setSelectedEmailIds] = useState<string[]>([]);
 
   const fetchEmails = async () => {
-    fetch(
-      "https://gist.githubusercontent.com/Jsarihan/d5f8cd2d159d676fbfb2fab94750635e/raw/b54cc1bd819b157a93bde00fe059825002f1f602/email.json"
-    )
-      .then((res) => res.json())
-      .then((data) => setEmails(data));
+    try {
+      setIsLoading(true);
+      const res = await axios.get(
+        "https://gist.githubusercontent.com/Jsarihan/d5f8cd2d159d676fbfb2fab94750635e/raw/b54cc1bd819b157a93bde00fe059825002f1f602/email.json"
+      );
+      const data = res.data;
+      setEmails(data);
+    } catch (err) {
+      if (err) {
+        setError("An unknown error has ocurred");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -27,9 +40,9 @@ const GmailMockupTwo = () => {
   }, []);
 
   const handleSelectedEmail = (email: Email) => {
-    setSelectedEmail([...selectedEmail, email]);
+    setSelectedEmail(email);
     setEmails(
-      emails.map((e) => (e.id === email.id ? { ...email, read: "true" } : e))
+      emails.map((e) => (e.id === email.id ? { ...e, read: "true" } : e))
     );
   };
 
@@ -44,7 +57,7 @@ const GmailMockupTwo = () => {
     setSelectedEmailIds(
       e.target.checked
         ? [...selectedEmailIds, id]
-        : selectedEmailIds.filter((email) => email !== id)
+        : selectedEmailIds.filter((emailId) => emailId! == id)
     );
   };
 
@@ -62,44 +75,53 @@ const GmailMockupTwo = () => {
   );
 
   return (
-    <div className="grid grid-cols-2">
+    <div>
       <div>
-        <button onClick={toggleReadStatus}>
-          {allSelectedAreRead ? "Mark as read" : "Mark as unread"}
-        </button>
-        {emails.map((email) => (
-          <div
-            key={email.id}
-            style={{
-              backgroundColor: email.read === "true" ? "#fff" : "#fafafb",
-            }}
-          >
-            <input
-              type="checkbox"
-              onChange={(e) => handleInputChange(e, email.id)}
-            />
-            <div key={email.id}>
-              {email.from} - {email.subject} - {email.time}
-            </div>
-            <button onClick={() => handleSelectedEmail(email)}>Select</button>
-            <button onClick={() => handleDeleteEmail(email.id)}>Delete</button>
-          </div>
-        ))}
-      </div>
-      <div>
-        {selectedEmail ? (
-          <div>
-            {selectedEmail.map((emailSelect) => (
-              <div>
-                {emailSelect.from}
-                {emailSelect.message}
-              </div>
-            ))}
-          </div>
+        {isLoading ? (
+          <div>Loading</div>
         ) : (
-          <div>Please select an email </div>
+          <div style={{ display: "flex" }}>
+            <div>
+              <button onClick={toggleReadStatus}>
+                {allSelectedAreRead ? "Mark as Unread" : "Mark as Read"}
+              </button>
+              {emails.map((email) => (
+                <div
+                  key={email.id}
+                  style={{
+                    backgroundColor: email.read === "true" ? "#fff" : "#fafafb",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleInputChange(e, email.id)}
+                  />
+                  {email.from}
+                  <p>{email.address}</p>
+                  <p>{email.time}</p>
+                  <button onClick={() => handleSelectedEmail(email)}>
+                    Select
+                  </button>
+                  <button onClick={() => handleDeleteEmail(email.id)}>
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div>
+              {selectedEmail ? (
+                <div>
+                  {selectedEmail.subject}
+                  <p>{selectedEmail.message}</p>
+                </div>
+              ) : (
+                <div>Please select an email to view</div>
+              )}
+            </div>
+          </div>
         )}
       </div>
+      {error && <p>{error}</p>}
     </div>
   );
 };
