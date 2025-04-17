@@ -1,9 +1,10 @@
 import GmailMockupTwo from "./components/GmailMockupTwo";
+import SocialMediaPostTwo from "./components/SocialMediaPostTwo";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <GmailMockupTwo />
+      <SocialMediaPostTwo />
     </div>
   );
 };

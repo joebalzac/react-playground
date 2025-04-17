@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface Post {
   id: number;
@@ -7,23 +7,26 @@ interface Post {
 }
 
 interface User {
+  userId: number;
   id: number;
   name: string;
+  username: string;
+  email: string;
 }
 
 interface Comment {
-  postId: number;
   id: number;
+  postId: number;
   name: string;
   email: string;
   body: string;
 }
 
-export default function App() {
+const SocialMediaPostTwo = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -36,44 +39,43 @@ export default function App() {
       fetch("https://jsonplaceholder.typicode.com/comments").then((res) =>
         res.json()
       ),
-    ]).then(([postsData, usersData, commentsData]) => {
-      setPosts(postsData);
-      setUsers(usersData);
-      setComments(commentsData);
+    ]).then(([postData, userData, commentData]) => {
+      setPosts(postData);
+      setUsers(userData);
+      setComments(commentData);
     });
-  }, []);
+  });
 
-  const handlePostClick = (postId: number) => {
-    setSelectedPostId(postId);
+  const handleSelectedPost = (post: Post) => {
+    setSelectedPost(post);
   };
 
   return (
-    <ul>
+    <div>
       {posts.map((post) => {
-        const author = users.find((user) => user.id === post.id);
-        const postComments = comments.filter(
-          (comment) => comment.postId === post.id
-        );
-
+        const authors = users.find((user) => user.id === post.id);
+        const postComments = comments.find((comment) => comment.id);
         return (
-          <li key={post.id} onClick={() => handlePostClick(post.id)}>
-            <h2>{post.title}</h2>
-            <p>{author ? `Author: ${author.name}` : "Unknown Author"}</p>
-            <p>{post.body}</p>
-
-            {selectedPostId === post.id && (
-              <ul>
-                {postComments.map((comment) => (
-                  <li key={comment.id}>
-                    <strong>{comment.name}</strong> ({comment.email})
-                    <p>{comment.body}</p>
-                  </li>
-                ))}
-              </ul>
+          <div>
+            <div key={post.id}>
+              {post.title}
+              {authors?.name}
+              <p>{post.body}</p>
+              <button onClick={() => handleSelectedPost(post)}>
+                Select Post
+              </button>
+            </div>
+            {selectedPost?.id === post.id && (
+              <div>
+                {postComments?.name}
+                <p>{postComments?.body}</p>
+              </div>
             )}
-          </li>
+          </div>
         );
       })}
-    </ul>
+    </div>
   );
-}
+};
+
+export default SocialMediaPostTwo;
