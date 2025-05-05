@@ -1,10 +1,9 @@
-import GmailMockupTwo from "./components/GmailMockupTwo";
-import SocialMediaPostTwo from "./components/SocialMediaPostTwo";
+import TodoList from "./components/TodoList";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <SocialMediaPostTwo />
+      <TodoList />
     </div>
   );
 };

@@ -2,30 +2,28 @@ import { useEffect, useState } from "react";
 
 interface Post {
   id: number;
+  userId: number;
   title: string;
   body: string;
 }
 
 interface User {
-  userId: number;
   id: number;
+  userId: number;
   name: string;
-  username: string;
-  email: string;
 }
 
 interface Comment {
   id: number;
-  postId: number;
   name: string;
-  email: string;
-  body: string;
+  title: string;
 }
 
 const SocialMediaPostTwo = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
@@ -41,10 +39,10 @@ const SocialMediaPostTwo = () => {
       ),
     ]).then(([postData, userData, commentData]) => {
       setPosts(postData);
-      setUsers(userData);
       setComments(commentData);
+      setUsers(userData);
     });
-  });
+  }, []);
 
   const handleSelectedPost = (post: Post) => {
     setSelectedPost(post);
@@ -54,23 +52,16 @@ const SocialMediaPostTwo = () => {
     <div>
       {posts.map((post) => {
         const authors = users.find((user) => user.id === post.id);
-        const postComments = comments.find((comment) => comment.id);
+        const commentPost = comments.find((comment) => comment.id === post.id);
+
         return (
           <div>
-            <div key={post.id}>
-              {post.title}
-              {authors?.name}
-              <p>{post.body}</p>
-              <button onClick={() => handleSelectedPost(post)}>
-                Select Post
-              </button>
-            </div>
-            {selectedPost?.id === post.id && (
-              <div>
-                {postComments?.name}
-                <p>{postComments?.body}</p>
-              </div>
-            )}
+            {post.title}
+            <h3>{authors?.name}</h3>
+            {selectedPost?.id === post.id && <div>{commentPost?.name}</div>}
+            <p>{post.body}</p>
+
+            <button onClick={() => handleSelectedPost(post)}>Select</button>
           </div>
         );
       })}

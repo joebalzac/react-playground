@@ -1,12 +1,11 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Email {
   id: string;
   from: string;
-  address: string;
-  subject: string;
   time: string;
+  subject: string;
   message: string;
   read: string;
 }
@@ -24,7 +23,7 @@ const GmailMockupTwo = () => {
       const res = await axios.get(
         "https://gist.githubusercontent.com/Jsarihan/d5f8cd2d159d676fbfb2fab94750635e/raw/b54cc1bd819b157a93bde00fe059825002f1f602/email.json"
       );
-      const data = res.data;
+      const data: Email[] = res.data;
       setEmails(data);
     } catch (err) {
       if (err) {
@@ -57,7 +56,7 @@ const GmailMockupTwo = () => {
     setSelectedEmailIds(
       e.target.checked
         ? [...selectedEmailIds, id]
-        : selectedEmailIds.filter((emailId) => emailId! == id)
+        : selectedEmailIds.filter((emailId) => emailId !== id)
     );
   };
 
@@ -78,27 +77,26 @@ const GmailMockupTwo = () => {
     <div>
       <div>
         {isLoading ? (
-          <div>Loading</div>
+          <div>Loading....</div>
         ) : (
           <div style={{ display: "flex" }}>
+            <button onClick={toggleReadStatus}>
+              {allSelectedAreRead ? "Mark as unread" : "Mark as read"}
+            </button>
             <div>
-              <button onClick={toggleReadStatus}>
-                {allSelectedAreRead ? "Mark as Unread" : "Mark as Read"}
-              </button>
               {emails.map((email) => (
                 <div
                   key={email.id}
                   style={{
-                    backgroundColor: email.read === "true" ? "#fff" : "#fafafb",
+                    background: email.read === "true" ? "#fff" : "#fafafb",
                   }}
                 >
                   <input
                     type="checkbox"
                     onChange={(e) => handleInputChange(e, email.id)}
                   />
-                  {email.from}
-                  <p>{email.address}</p>
-                  <p>{email.time}</p>
+                  <h3>{email.from}</h3>
+                  <h4>{email.subject}</h4>
                   <button onClick={() => handleSelectedEmail(email)}>
                     Select
                   </button>
@@ -108,20 +106,21 @@ const GmailMockupTwo = () => {
                 </div>
               ))}
             </div>
+
             <div>
               {selectedEmail ? (
                 <div>
-                  {selectedEmail.subject}
+                  <h3>{selectedEmail.subject}</h3>
                   <p>{selectedEmail.message}</p>
                 </div>
               ) : (
-                <div>Please select an email to view</div>
+                <div>Please select an email to view....</div>
               )}
             </div>
           </div>
         )}
       </div>
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };
