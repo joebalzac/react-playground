@@ -1,3 +1,17 @@
+#header {
+  background: #ffffff !important;
+}
+
+#header .header-left {
+  padding-left: 56px;
+}
+
+a.header-logo-link {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+}
+
 .catalog-center-width .catalog-header {
   padding-left: 0px;
 }
@@ -24,13 +38,23 @@
   margin: 0 auto;
 }
 
-.headline-one {
+h1 {
   font-size: 60px !important;
   font-style: normal;
   font-weight: 450 !important;
   line-height: 105%;
   margin: 0px !important;
   padding-bottom: 16px;
+}
+
+h2 {
+  font-family: Inter;
+  font-size: 20px !important;
+  font-style: normal;
+  font-weight: 400 !important;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+  margin-bottom: 32px !important;
 }
 
 .subtitle {
@@ -84,11 +108,15 @@
 }
 
 .player {
-  border-radius: 8px;
+  border-radius: 8px !important;
 }
 
 .vp-center {
   display: block !important;
+}
+
+.dp-summary-wrapper {
+  border: none !important;
 }
 
 .courses-title-section {
@@ -153,7 +181,7 @@ a.coursebox-container .coursebox-text-description {
   font-size: 18px !important;
   font-style: normal;
   font-weight: 400;
-  line-height: 150%; 
+  line-height: 150%;
   letter-spacing: -0.18px;
 }
 
@@ -281,5 +309,11 @@ a.coursebox-container .coursebox-text-description {
     font-weight: 400;
     line-height: 150%;
     letter-spacing: -0.16px;
+  }
+}
+
+@media screen and (max-width: 875px) {
+  .header-links-container {
+    display: none !important;
   }
 }
