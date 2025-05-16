@@ -2,28 +2,30 @@ import { useEffect, useState } from "react";
 
 interface Post {
   id: number;
-  userId: number;
+  postId: number;
   title: string;
   body: string;
 }
 
 interface User {
   id: number;
-  userId: number;
   name: string;
+  userName: string;
+  email: string;
 }
 
 interface Comment {
   id: number;
+  postId: number;
   name: string;
-  title: string;
+  email: string;
+  body: string;
 }
 
 const SocialMediaPostTwo = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-
+  const [comments, setComments] = useState<Comment[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
@@ -39,29 +41,27 @@ const SocialMediaPostTwo = () => {
       ),
     ]).then(([postData, userData, commentData]) => {
       setPosts(postData);
-      setComments(commentData);
       setUsers(userData);
+      setComments(commentData);
     });
-  }, []);
+  });
 
-  const handleSelectedPost = (post: Post) => {
-    setSelectedPost(post);
-  };
+  const handleSelectedPost = (post: Post) => setSelectedPost(post);
 
   return (
     <div>
       {posts.map((post) => {
         const authors = users.find((user) => user.id === post.id);
-        const commentPost = comments.find((comment) => comment.id === post.id);
-
+        const postComment = comments.find((comment) => comment.id === post.id);
         return (
           <div>
             {post.title}
-            <h3>{authors?.name}</h3>
-            {selectedPost?.id === post.id && <div>{commentPost?.name}</div>}
+            {authors?.name}
             <p>{post.body}</p>
-
-            <button onClick={() => handleSelectedPost(post)}>Select</button>
+            <button onClick={() => handleSelectedPost(post)}>
+              Select Post Biatch
+            </button>
+            {selectedPost?.id === post.id && <div>{postComment?.name}</div>}
           </div>
         );
       })}

@@ -1,21 +1,22 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Email {
   id: string;
   from: string;
-  time: string;
   subject: string;
   message: string;
+  address: string;
+  time: string;
   read: string;
 }
 
 const GmailMockupTwo = () => {
   const [emails, setEmails] = useState<Email[]>([]);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [selectedEmailIds, setSelectedEmailIds] = useState<string[]>([]);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchEmails = async () => {
     try {
@@ -26,9 +27,7 @@ const GmailMockupTwo = () => {
       const data: Email[] = res.data;
       setEmails(data);
     } catch (err) {
-      if (err) {
-        setError("An unknown error has ocurred");
-      }
+      setError("an unknown error has ocurred");
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +35,7 @@ const GmailMockupTwo = () => {
 
   useEffect(() => {
     fetchEmails();
-  }, []);
+  });
 
   const handleSelectedEmail = (email: Email) => {
     setSelectedEmail(email);
@@ -69,58 +68,52 @@ const GmailMockupTwo = () => {
     );
   };
 
-  const allSelectedAreRead = selectedEmailIds.every(
-    (id) => emails.find((email) => email.id === id)?.read === "true"
-  );
+  const allSelectedRead = selectedEmailIds.every((id) => {
+    emails.find((email) => email.id === id)?.read === "true";
+  });
 
   return (
     <div>
-      <div>
-        {isLoading ? (
-          <div>Loading....</div>
-        ) : (
-          <div style={{ display: "flex" }}>
-            <button onClick={toggleReadStatus}>
-              {allSelectedAreRead ? "Mark as unread" : "Mark as read"}
-            </button>
-            <div>
-              {emails.map((email) => (
-                <div
-                  key={email.id}
-                  style={{
-                    background: email.read === "true" ? "#fff" : "#fafafb",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    onChange={(e) => handleInputChange(e, email.id)}
-                  />
-                  <h3>{email.from}</h3>
-                  <h4>{email.subject}</h4>
-                  <button onClick={() => handleSelectedEmail(email)}>
-                    Select
-                  </button>
-                  <button onClick={() => handleDeleteEmail(email.id)}>
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <div>
+          <button onClick={toggleReadStatus}>
+            {allSelectedRead ? "Mark as unread" : "Mark as read"}
+          </button>
+          <div>
+            {emails.map((email) => (
+              <div key={email.id}>
+                <input
+                  type="checkbox"
+                  onChange={(e) => handleInputChange(e, email.id)}
+                />
 
-            <div>
-              {selectedEmail ? (
-                <div>
-                  <h3>{selectedEmail.subject}</h3>
-                  <p>{selectedEmail.message}</p>
-                </div>
-              ) : (
-                <div>Please select an email to view....</div>
-              )}
-            </div>
+                <h3>{email.from}</h3>
+                <h4>{email.subject}</h4>
+
+                <button onClick={() => handleSelectedEmail(email)}>
+                  Select
+                </button>
+                <button onClick={() => handleDeleteEmail(email.id)}>
+                  Delete
+                </button>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+          <div>
+            {selectedEmail ? (
+              <div>
+                {selectedEmail.subject}
+                <p>{selectedEmail.message}</p>
+              </div>
+            ) : (
+              <div>Please select an email</div>
+            )}
+          </div>
+          {error && <p>{error}</p>}
+        </div>
+      )}
     </div>
   );
 };
